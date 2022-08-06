@@ -1,0 +1,24 @@
+{
+    "products": {
+        "000000000014002686": {
+            "title": "แบรนด์ วีไลค์ ซุปไก่สกัด 42 มล.",
+            "description": "Test",
+            "condition": "new",
+            "link": "https://www.google.co.th",
+            "availability": "out of stock",
+            "price": "444.0 THB",
+            "image_link": "https://www.google.co.th",
+            "brand": "Brand"
+        },
+        "000000000014004982": {
+            "title": "แบรนด์ สารสกัดจากแบล็กเคอร์แรนท์ ผสมลูทีนและซีแซนทีน 60 เม็ด",
+            "description": "Test",
+            "condition": "new",
+            "link": "https://www.google.co.th",
+            "availability": "out of stock",
+            "price": "1220.0 THB",
+            "image_link": "https://www.google.co.th",
+            "brand": "Brand"
+        }
+    }
+}
