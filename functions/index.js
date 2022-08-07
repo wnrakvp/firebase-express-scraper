@@ -1,4 +1,3 @@
-const admin = require('firebase-admin');
 const functions = require('firebase-functions');
 const {detailedDiff} = require('deep-object-diff');
 const axios = require('axios');
@@ -11,11 +10,9 @@ const axios = require('axios');
 //     'https://dev-adapter-353805-default-rtdb.asia-southeast1.firebasedatabase.app',
 // });
 
-// ---------------- USE FOR DEVELOPMENT PURPOSE --------------------------------
-admin.initializeApp();
-// ---------------- USE FOR DEVELOPMENT PURPOSE --------------------------------
-
 exports.getProduct = functions.https.onRequest((req, res) => {
+  const admin = require('firebase-admin');
+  admin.initializeApp();
   try {
     // const ref = await connectDB(admin, 'testDB');
     const db = admin.database();
@@ -46,40 +43,37 @@ exports.FacebookCatalogTrigger = functions.database
           change.after.val()
       );
       const requests = [];
-      console.log(Object.keys(differences.updated.products));
-      console.log(Object.values(differences.updated.products));
-      // id.forEach((id)=> {
-      requests.push({
-        method: 'UPDATE',
-        data: {
-          id: Object.keys(differences.updated.products)[0],
-          title: 'แบรนด์ วีไลค์ ซุปไก่สกัด 42 มล.',
-          description: 'Test',
-          condition: 'new',
-          link: 'https://www.google.co.th',
-          availability: 'out of stock',
-          price: '2000 THB',
-          image_link: 'https://www.google.co.th',
-          brand: 'Brand',
-        },
-      });
-      console.log(requests);
-      // Cool Beans Long-lived Page Token
-      const accessToken = 'EAAECdwZBqHzEBAHaivpSFBMoQZBBWv1McHe9BcOluFNMthzf2zozFJmFAt57gNvwFaNHojLFvSK3nexhATlUifz1ZBxLXH90jPKYqwGZADtTohyFG589pUSevAEjwh0I8QFGrMjBfwWLAqQsthkKT8jWOH5gSh5F7c7sTkRNV8YmrRGuu1yPnMLVDIhr7yjJUQND3iOT1wZDZD';
-      const catalogId = '3256983894625954'; // Cool Beans Catalog ID
-      const apiVersion = 'v14.0';
-
-      const url = `https://graph.facebook.com/${apiVersion}/${catalogId}/items_batch`;
-      const payload = {
-        accessToken,
-        item_type: 'PRODUCT_ITEM',
-        requests,
-      };
-      const result = axios.post(url, payload)
-          .then((response) => console.log(response))
-          .catch((err)=>console.error(err));
-      // functions.logger.info(differences);
-      return result;
+      console.log(differences.added);
+      console.log(differences.deleted);
+      console.log(differences.updated);
+      if (differences.updated !== {}) {
+        requests.push({
+          method: 'UPDATE',
+          data: Object.assign({
+            id: Object.keys(differences.updated.products)[0],
+          }, Object.values(differences.updated.products)[0]),
+        });
+      }
+      return console.log(requests);
+    //   // Cool Beans Long-lived Page Token
+    //   const accessToken =
+    //         'EAAECdwZBqHzEBAHaivpSFBMoQZBBWv1McHe9BcOluFNMthzf2zozFJmFAt57gNvwFaNHojLFvSK3nexhATlUifz1ZBxLXH90jPKYqwGZADtTohyFG589pUSevAEjwh0I8QFGrMjBfwWLAqQsthkKT8jWOH5gSh5F7c7sTkRNV8YmrRGuu1yPnMLVDIhr7yjJUQND3iOT1wZDZD';
+    //   const catalogId = '3256983894625954'; // Cool Beans Catalog ID
+    //   const apiVersion = 'v14.0';
+    //   const url = `https://graph.facebook.com/${apiVersion}/${catalogId}/items_batch`;
+    //   const payload = {
+    //     access_token: accessToken,
+    //     item_type: 'PRODUCT_ITEM',
+    //     requests,
+    //   };
+    //   return axios
+    //       .post(url, payload)
+    //       .then((response) => {
+    //         console.log(response);
+    //       })
+    //       .catch((err) => {
+    //         console.log(err);
+    //       });
     });
 
 // exports.GoogleCatalogTrigger = functions.database
@@ -89,3 +83,4 @@ exports.FacebookCatalogTrigger = functions.database
 //     functions.logger.info(snapshot.val());
 //     return snapshot.val();
 //   });
+
