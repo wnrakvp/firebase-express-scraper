@@ -1,4 +1,5 @@
 const functions = require('firebase-functions');
+const key = functions.config().stripe.key;
 const {detailedDiff} = require('deep-object-diff');
 const axios = require('axios');
 // const connectDB = require('./config/connectDB');
@@ -34,24 +35,53 @@ exports.getProduct = functions.https.onRequest((req, res) => {
   }
 });
 
-exports.FacebookCatalogTrigger = functions.database
-    // .instance('dev-adapter-353805')
+exports.FacebookCatalogTrigger = functions
+    .database// .instance('dev-adapter-353805')
     .ref()
     .onWrite((change, context) => {
-      const differences = detailedDiff(
-          change.before.val(),
-          change.after.val()
-      );
+      const differences = detailedDiff(change.before.val(), change.after.val());
       const requests = [];
-      console.log(differences.added);
-      console.log(differences.deleted);
-      console.log(differences.updated);
-      if (differences.updated !== {}) {
-        requests.push({
-          method: 'UPDATE',
-          data: Object.assign({
-            id: Object.keys(differences.updated.products)[0],
-          }, Object.values(differences.updated.products)[0]),
+      console.log(differences);
+      if (differences.added.products !== undefined) {
+        const addProducts = [];
+        addProducts.push(differences.added.products);
+        addProducts.forEach((add) => {
+          requests.push({
+            method: 'CREATE',
+            data: Object.assign(
+                {
+                  id: Object.keys(add)[0],
+                },
+                Object.values(add)[0]
+            ),
+          });
+        });
+      }
+      if (differences.deleted.products !== undefined) {
+        const delProducts = [];
+        delProducts.push(differences.deleted.products);
+        delProducts.forEach((del) => {
+          requests.push({
+            method: 'DELETE',
+            data: Object.assign({
+              id: Object.keys(del)[0],
+            }),
+          });
+        });
+      }
+      if (differences.updated.products !== undefined) {
+        const upProducts = [];
+        upProducts.push(differences.updated.products);
+        upProducts.forEach((up) => {
+          requests.push({
+            method: 'UPDATE',
+            data: Object.assign(
+                {
+                  id: Object.keys(up)[0],
+                },
+                Object.values(up)[0]
+            ),
+          });
         });
       }
       return console.log(requests);
@@ -83,4 +113,3 @@ exports.FacebookCatalogTrigger = functions.database
 //     functions.logger.info(snapshot.val());
 //     return snapshot.val();
 //   });
-

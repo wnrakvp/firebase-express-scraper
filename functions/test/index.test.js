@@ -13,3 +13,16 @@ const test = require('firebase-functions-test')(
     },
     './config/service-account/firebase_service.json'
 );
+
+const myFunction = require('../index');
+// Make snapshot for state of database beforehand
+const beforeSnap = test.database.makeDataSnapshot({foo: 'bar'}, 'document/path');
+// Make snapshot for state of database after the change
+const afterSnap = test.database.makeDataSnapshot({foo: 'faz'}, 'document/path');
+const change = test.makeChange(beforeSnap, afterSnap);
+// Call wrapped function with the Change object
+const wrapped = test.wrap(myFunction.FacebookCatalogTrigger);
+wrapped(change);
+
+// Mock functions config values
+test.mockConfig({stripe: {key: '23wr42ewr34'}});
