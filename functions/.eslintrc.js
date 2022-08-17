@@ -5,6 +5,14 @@ module.exports = {
     node: true,
   },
   extends: ['eslint:recommended', 'google'],
+  parser: '@babel/eslint-parser',
+  parserOptions: {
+    requireConfigFile: false,
+    babelOptions: {
+      babelrc: false,
+      configFile: false,
+    },
+  },
   rules: {
     quotes: ['error', 'single'],
   },
